@@ -1,4 +1,4 @@
-module bars
+module github.com/ilyadubrovsky/bars
 
 go 1.20
 

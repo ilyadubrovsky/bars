@@ -14,6 +14,7 @@ type Client struct {
 	httpClient *http.Client
 }
 
+// NewClient создаёт нового клиента для взаимодействия с БАРС.
 func NewClient() *Client {
 	jar, _ := cookiejar.New(nil)
 	return &Client{
