@@ -66,10 +66,10 @@ func (pt *ProgressTable) validateData() error {
 	return nil
 }
 
-// GetProgressTable получает табель успеваемости авторизованного студента.
-// Возвращает ошибку с информацией, если полезная нагрузка таблицы оказалась пустой.
+// GetProgressTable получает табель успеваемости авторизованного студента и возращает JSON encode.
+// Возвращает ошибку с информацией, если полезная нагрузка таблицы оказалась пустой или возникла другая непредвиденная ошибка.
 // Заменяет пустые поля для оценок на "отсутствует".
-func (c *Client) GetProgressTable() (*ProgressTable, error) {
+func (c *Client) GetProgressTable() ([]byte, error) {
 	response, err := c.getPage(context.TODO(), http.MethodGet, GradesPageURL, nil)
 	if err != nil {
 		return nil, err
@@ -125,7 +125,7 @@ func (c *Client) GetProgressTable() (*ProgressTable, error) {
 						ceObject.Name = processedString
 					}
 				case tdSelection.Length() - 1:
-					if processedString == "" {
+					if isEmptyData(processedString) {
 						ceObject.Grades = "отсутствует"
 					} else {
 						ceObject.Grades = processedString
@@ -146,7 +146,7 @@ func (c *Client) GetProgressTable() (*ProgressTable, error) {
 		return nil, err
 	}
 
-	return ptObject, nil
+	return Marshal(ptObject)
 }
 
 func removeExtraSpaces(s string) string {
