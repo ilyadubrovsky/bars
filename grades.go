@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
-	"unicode/utf8"
 )
 
 // ProgressTable Таблица оценок в БАРС.
@@ -58,18 +57,10 @@ func (c *ControlEvent) String() string {
 	return fmt.Sprintf("Контрольное мероприятие: %s\nОценка: %s\n", c.Name, c.Grades)
 }
 
-func (pt *ProgressTable) validateData() error {
-	if !utf8.ValidString(pt.String()) {
-		return fmt.Errorf("data in progress table is invalid")
-	}
-
-	return nil
-}
-
 // GetProgressTable получает табель успеваемости авторизованного студента и возращает JSON encode.
 // Возвращает ошибку с информацией, если полезная нагрузка таблицы оказалась пустой или возникла другая непредвиденная ошибка.
 // Заменяет пустые поля для оценок на "отсутствует".
-func (c *Client) GetProgressTable() ([]byte, error) {
+func (c *Client) GetProgressTable() (*ProgressTable, error) {
 	response, err := c.getPage(context.TODO(), http.MethodGet, GradesPageURL, nil)
 	if err != nil {
 		return nil, err
@@ -146,7 +137,7 @@ func (c *Client) GetProgressTable() ([]byte, error) {
 		return nil, err
 	}
 
-	return Marshal(ptObject)
+	return ptObject, nil
 }
 
 func removeExtraSpaces(s string) string {
