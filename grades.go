@@ -60,8 +60,8 @@ func (c *ControlEvent) String() string {
 // GetProgressTable получает табель успеваемости авторизованного студента и возращает JSON encode.
 // Возвращает ошибку с информацией, если полезная нагрузка таблицы оказалась пустой или возникла другая непредвиденная ошибка.
 // Заменяет пустые поля для оценок на "отсутствует".
-func (c *Client) GetProgressTable() (*ProgressTable, error) {
-	response, err := c.getPage(context.TODO(), http.MethodGet, GradesPageURL, nil)
+func (c *Client) GetProgressTable(ctx context.Context) (*ProgressTable, error) {
+	response, err := c.getPage(ctx, http.MethodGet, GradesPageURL, nil)
 	if err != nil {
 		return nil, err
 	}
