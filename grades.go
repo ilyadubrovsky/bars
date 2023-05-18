@@ -58,12 +58,17 @@ func (c *ControlEvent) String() string {
 }
 
 // GetProgressTable получает табель успеваемости авторизованного студента и возращает JSON encode.
+// Возращает ErrWrongGradesPage, если страница с оценками пользователя не является основной.
 // Возвращает ошибку с информацией, если полезная нагрузка таблицы оказалась пустой или возникла другая непредвиденная ошибка.
 // Заменяет пустые поля для оценок на "отсутствует".
 func (c *Client) GetProgressTable(ctx context.Context) (*ProgressTable, error) {
 	response, err := c.getPage(ctx, http.MethodGet, GradesPageURL, nil)
 	if err != nil {
 		return nil, err
+	}
+
+	if !strings.HasPrefix(response.Request.URL.String(), PersonalGradesPageURL) {
+		return nil, ErrWrongGradesPage
 	}
 
 	document, err := goquery.NewDocumentFromReader(response.Body)
@@ -102,7 +107,7 @@ func (c *Client) GetProgressTable(ctx context.Context) (*ProgressTable, error) {
 		stObject := SubjectTable{ControlEvents: make([]ControlEvent, stLen)}
 
 		trSelection.EachWithBreak(func(trID int, tr *goquery.Selection) bool {
-			ceObject := ControlEvent{}
+			eventObject := ControlEvent{}
 			tdSelection := tr.Find("td")
 
 			tdSelection.EachWithBreak(func(tdID int, td *goquery.Selection) bool {
@@ -113,20 +118,20 @@ func (c *Client) GetProgressTable(ctx context.Context) (*ProgressTable, error) {
 						err = fmt.Errorf("part of received data is empty. tdId: %d trId: %d tbodyId: %d", tdID, trID, tbodyID)
 						flag = false
 					} else {
-						ceObject.Name = processedString
+						eventObject.Name = processedString
 					}
 				case tdSelection.Length() - 1:
 					if isEmptyData(processedString) {
-						ceObject.Grades = "отсутствует"
+						eventObject.Grades = "отсутствует"
 					} else {
-						ceObject.Grades = processedString
+						eventObject.Grades = processedString
 					}
 				}
 
 				return flag
 			})
 
-			stObject.ControlEvents[trID] = ceObject
+			stObject.ControlEvents[trID] = eventObject
 			return flag
 		})
 

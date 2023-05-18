@@ -25,7 +25,6 @@ func NewClient() *Client {
 // Authorization выполняет авторизацию пользователя по его username и password в системе БАРС.
 // Возвращает ErrNoAuth, если авторизация выполнена неуспешно.
 func (c *Client) Authorization(ctx context.Context, username, password string) error {
-	cl := c.httpClient
 	verificationToken, err := c.getVerificationToken(ctx)
 	if err != nil {
 		return fmt.Errorf("client authorization: %v", err)
@@ -46,7 +45,7 @@ func (c *Client) Authorization(ctx context.Context, username, password string) e
 	request.Header.Set("Accept-Language", "ru,en;q=0.9")
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
-	response, err := cl.Do(request)
+	response, err := c.httpClient.Do(request)
 	if err != nil {
 		return err
 	}
@@ -70,8 +69,6 @@ func (c *Client) Authorization(ctx context.Context, username, password string) e
 // getPage выполняет запрос с установленными заголовками request.Header.
 // Возвращает http.Response, если запрос выполнен успешно.
 func (c *Client) getPage(ctx context.Context, method string, url string, body io.Reader) (*http.Response, error) {
-	cl := c.httpClient
-
 	request, err := http.NewRequestWithContext(ctx, method, url, body)
 	if err != nil {
 		return nil, err
@@ -80,7 +77,7 @@ func (c *Client) getPage(ctx context.Context, method string, url string, body io
 	request.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 YaBrowser/22.11.5.715 Yowser/2.5 Safari/537.36")
 	request.Header.Set("Accept-Language", "ru,en;q=0.9")
 
-	response, err := cl.Do(request)
+	response, err := c.httpClient.Do(request)
 	if err != nil {
 		return nil, err
 	}

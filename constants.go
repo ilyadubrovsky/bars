@@ -1,9 +1,10 @@
 package bars
 
 const (
-	MainURL         = "https://bars.mpei.ru/bars_web/"
-	RegistrationURL = "https://bars.mpei.ru/bars_web/"
-	GradesPageURL   = "https://bars.mpei.ru/bars_web/?sod=1"
+	MainURL               = "https://bars.mpei.ru/bars_web/"
+	RegistrationURL       = "https://bars.mpei.ru/bars_web/"
+	GradesPageURL         = "https://bars.mpei.ru/bars_web/"
+	PersonalGradesPageURL = "https://bars.mpei.ru/bars_web/ST_Study/Main/Main?studentID"
 )
 
 const (
