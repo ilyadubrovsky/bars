@@ -23,6 +23,7 @@ func NewClient() *Client {
 }
 
 // Authorization выполняет авторизацию пользователя по его username и password в системе БАРС.
+// Возращает ErrWrongGradesPage, если страница с оценками пользователя не является основной.
 // Возвращает ErrNoAuth, если авторизация выполнена неуспешно.
 func (c *Client) Authorization(ctx context.Context, username, password string) error {
 	verificationToken, err := c.getVerificationToken(ctx)
