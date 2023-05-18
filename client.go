@@ -50,6 +50,10 @@ func (c *Client) Authorization(ctx context.Context, username, password string) e
 		return err
 	}
 
+	if !strings.HasPrefix(response.Request.URL.String(), PersonalGradesPageURL) {
+		return ErrWrongGradesPage
+	}
+
 	_, err = io.ReadAll(response.Body)
 	if err != nil {
 		return err
