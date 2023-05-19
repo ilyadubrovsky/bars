@@ -51,6 +51,12 @@ func (c *Client) Authorization(ctx context.Context, username, password string) e
 		return err
 	}
 
+	authstatus := authStatus(response)
+
+	if !authstatus {
+		return ErrNoAuth
+	}
+
 	if !strings.HasPrefix(response.Request.URL.String(), PersonalGradesPageURL) {
 		return ErrWrongGradesPage
 	}
@@ -61,12 +67,6 @@ func (c *Client) Authorization(ctx context.Context, username, password string) e
 	}
 
 	defer response.Body.Close()
-
-	authstatus := authStatus(response)
-
-	if !authstatus {
-		return ErrNoAuth
-	}
 
 	return nil
 }
